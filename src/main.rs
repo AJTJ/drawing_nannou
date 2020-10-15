@@ -63,6 +63,33 @@ fn view(app: &App, frame: Frame) {
 
     draw.polyline().weight(3.0).points_colored(poly_points);
 
+    // polyline circle
+    let radius = 300.0;
+    let create_circle_points = (0..=360).step_by(45).map(|i| {
+        // convert each degree to radians.
+        let radian = deg_to_rad(i as f32);
+        // Get the sine of the radian to find the x co-ordinate of this point onf the circle
+        // and multiply it by the radius.
+        let x = radian.sin() * radius;
+        // Do the same with cosine to find the y co-ordinate.
+        let y = radian.cos() * radius;
+        // Construct and return a point object wiht a color.
+        (pt2(x, y), BLACK)
+    });
+
+    // your closure returns a 2-tuple, not a 0-tuple, and only heap-allocated collections implement FromIterator, try let circle_points: Vec<_> = ... instead
+
+    let circle_points: Vec<_> = create_circle_points.collect();
+
+    // create a polyline builder. Hot-tip: polyline is short-hand for a path that is
+    // drawn via "stroke" tessellation rather than "fill" tessellation.
+    draw.polyline().weight(3.0).points_colored(&circle_points);
+
+    // a filled version
+    draw.polygon()
+        .points_colored(&circle_points)
+        .x_y(-200.0, 200.0);
+
     // Write to the window frame
     draw.to_frame(app, &frame).unwrap();
 }
